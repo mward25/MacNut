@@ -4,11 +4,12 @@
 #include <compare>
 #include <optional>
 #include <string>
+<compare>
 
 #define MNUT_PUT_ENUM_PART(enumName, ...) enumName __VA_ARGS__,
 
 #define MNUT_PUT_INTERNAL_ENUM(EnumType, FOREACH_ENUM) \
-    enum class InternalEnum : EnumType { FOREACH_ENUM(PUT_ENUM_PART) };
+    enum class InternalEnum : EnumType { FOREACH_ENUM(MNUT_PUT_ENUM_PART) };
 
 #define MNUT_PUT_STATIC_STR_FUNC_PART(enumName, ...) \
     case InternalEnum::enumName:                \
@@ -17,8 +18,8 @@
 
 #define MNUT_PUT_STATIC_STR_FUNC(EnumName, EnumType, FOREACH_ENUM)            \
     static constexpr std::string_view str(EnumName val) {                \
-        FOREACH_ENUM(PUT_STATIC_STR_FUNC_PART_STRS) switch (val.value) { \
-            FOREACH_ENUM(PUT_STATIC_STR_FUNC_PART)                       \
+        FOREACH_ENUM(MNUT_PUT_STATIC_STR_FUNC_PART_STRS) switch (val.value) { \
+            FOREACH_ENUM(MNUT_PUT_STATIC_STR_FUNC_PART)                       \
             default:                                                     \
                 return "";                                               \
         }                                                                \
@@ -31,7 +32,7 @@
 
 #define MNUT_PUT_STATIC_FROM_STR_FUNC(EnumName, FOREACH_ENUM)                             \
     static constexpr std::optional<EnumName> from(const std::string_view inputStr) { \
-        FOREACH_ENUM(PUT_STATIC_FROM_STR_FUNC_PART)                                  \
+        FOREACH_ENUM(MNUT_PUT_STATIC_FROM_STR_FUNC_PART)                                  \
         return std::optional<EnumName>();                                            \
     }
 
@@ -41,13 +42,13 @@
 #define MNUT_PUT_ENUM_SIZE_PART(enumName, ...) 1 +
 
 #define MNUT_PUT_ENUM_SIZE(EnumName, EnumType, FOREACH_ENUM) \
-    static constexpr EnumType SIZE = FOREACH_ENUM(PUT_ENUM_SIZE_PART) 0;
+    static constexpr EnumType SIZE = FOREACH_ENUM(MNUT_PUT_ENUM_SIZE_PART) 0;
 
 #define MNUT_PUT_ENUM_VALUES_PART(enumName, ...) FancyEnumClass::enumName(),
 
 #define MNUT_PUT_ENUM_VALUES(EnumName, EnumType, FOREACH_ENUM)                                \
     static constexpr std::array<EnumName, EnumName::SIZE> values() {                     \
-        return std::array<EnumName, EnumName::SIZE>{FOREACH_ENUM(PUT_ENUM_VALUES_PART)}; \
+        return std::array<EnumName, EnumName::SIZE>{FOREACH_ENUM(MNUT_PUT_ENUM_VALUES_PART)}; \
     }
 
 /**
@@ -66,11 +67,11 @@
  * Example:
  *   auto allValues = EffectType::values();  // std::array<EffectType, N>
  */
-#define MNUT_PUT_FANCY_ENUM(EnumName, EnumType, FOREACH_ENUM)                                        \
+#define MNUT_PUT_FANCY_ENUM(EnumName, EnumType, FOREACH_ENUM, ...)                              \
     struct EnumName {                                                                           \
         private:                                                                                \
             using FancyEnumClass = EnumName;                                                    \
-            MNUT_PUT_INTERNAL_ENUM(EnumType, FOREACH_ENUM)                                           \
+            MNUT_PUT_INTERNAL_ENUM(EnumType, FOREACH_ENUM)                                      \
             InternalEnum value;                                                                 \
             constexpr EnumName(const InternalEnum& value) : value(value) {}                     \
                                                                                                 \
@@ -83,7 +84,7 @@
                                                                                                 \
             /** Default Operators */                                                            \
             constexpr bool operator==(const EnumName&) const                  = default;        \
-            constexpr std::strong_ordering operator<=>(const EnumName&) const = default;        \
+            constexpr std::strong_ordering operator <=> (const EnumName&) const = default;        \
             using Type                                                        = EnumType;       \
             constexpr explicit operator Type() const { return static_cast<Type>(this->value); } \
             constexpr operator InternalEnum() const {                                           \
@@ -93,12 +94,13 @@
             static constexpr EnumType raw(EnumName input) { return static_cast<Type>(input); }  \
             constexpr EnumType raw() const { return EnumName::raw(*this); }                     \
             /** SIZE is how many enums there are, not the biggest enum */                       \
-            MNUT_PUT_ENUM_SIZE(EnumName, EnumType, FOREACH_ENUM)                                     \
-            MNUT_PUT_STATIC_STR_FUNC(EnumName, EnumType, FOREACH_ENUM)                               \
+            MNUT_PUT_ENUM_SIZE(EnumName, EnumType, FOREACH_ENUM)                                \
+            MNUT_PUT_STATIC_STR_FUNC(EnumName, EnumType, FOREACH_ENUM)                          \
             constexpr std::string_view str() const { return EnumName::str(*this); }             \
-            MNUT_PUT_STATIC_FROM_STR_FUNC(EnumName, FOREACH_ENUM)                                    \
-            FOREACH_ENUM(PUT_ENUM_FUNCS_PART)                                                   \
-            MNUT_PUT_ENUM_VALUES(EnumName, EnumType, FOREACH_ENUM)                                   \
+            MNUT_PUT_STATIC_FROM_STR_FUNC(EnumName, FOREACH_ENUM)                               \
+            FOREACH_ENUM(MNUT_PUT_ENUM_FUNCS_PART)                                                   \
+            MNUT_PUT_ENUM_VALUES(EnumName, EnumType, FOREACH_ENUM)                              \
+            __VA_ARGS__##__VA_OPT__((EnumName, EnumType, FOREACH_ENUM))\
     };                                                                                          \
     template <>                                                                                 \
     struct std::hash<EnumName> {                                                                \
@@ -106,3 +108,10 @@
                 return std::hash<EnumType>{}(s.raw());                                          \
             }                                                                                   \
     };
+
+#define FOREACH_TestEnum(X) \
+    X(PEACHES)\
+    X(APPLES)\
+    X(PEARS)
+
+MNUT_PUT_FANCY_ENUM(TestEnum, int, FOREACH_TestEnum)
