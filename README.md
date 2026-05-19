@@ -1,5 +1,7 @@
 # MacNut
 
-This is a collection of useful macros I'm collecting, it may eventually be something others will use, or it may not.
+A personal collection of reusable macros I'm gathering.
 
-Ultimately, it's more for my fun than actual use for the general public.
+This is a personal project, and is mostly for my own fun and experimentation.
+
+Everything is licensed under MIT (see [LICENSE](LICENSE]).
