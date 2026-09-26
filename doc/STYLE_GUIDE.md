@@ -11,7 +11,7 @@ Some parts may not be relevant.
 /// clang-format off
 -->
 
-# Table of Contents
+## Table of Contents
 
 <!--
 /// clang-format on
@@ -44,19 +44,13 @@ Some parts may not be relevant.
 
 ---
 
-<!-- TOC --><a name="unless-otherwise-specified-below-follow-the-google-c-style-guide"></a>
-
-## Unless otherwise specified below, follow [the Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
+### Unless otherwise specified below, follow [the Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 
 ---
 
-<!-- TOC --><a name="code-syntax"></a>
+### Code Syntax
 
-## Code Syntax
-
-<!-- TOC --><a name="includes-and-namespace"></a>
-
-### Includes and Namespace
+#### Includes and Namespace
 
 ```cpp
 /// Use pragma once instead of header guards
@@ -82,9 +76,7 @@ namespace bOpt = boost::program_options;
 /// DO NOT DO THIS: "using namespace boost::program_options;"
 ```
 
-<!-- TOC --><a name="namespaces"></a>
-
-### Namespaces
+#### Namespaces
 
 All classes must be organized into appropriate namespaces using lowercase,
 colon-separated naming. Namespaces follow the application structure:
@@ -141,9 +133,7 @@ SongsBySetlist::SongsBySetlist(QObject* parent)
 - Subdivide large modules: `macnut::db::model`, `macnut::db::query`, etc.
 - Close namespace blocks with comments indicating the full namespace path
 
-<!-- TOC --><a name="classes-functions-variables-and-macros"></a>
-
-### Classes, Functions, Variables, and Macros
+#### Classes, Functions, Variables, and Macros
 
 ```cpp
 /// const variables are in SCREAMING_SNAKE_CASE
@@ -152,7 +142,7 @@ const int BIG_NUM = 1000;
 /// Macro parameters are in SCREAMING_SNAKE_CASE with a postfixed '_'. If a parameter references an object, and the macro includes a screming clause before the object, then the object is written verbosely.
 #define USELESS_MACRO_PRINT(USELESS_)                                                        \
     std::cout << #USELESS_ << "is USELESS_, you probably shouldn't use " << #USELESS_ << ".\n" \
-              << "If you must use " << #USELESS_ << " do so very carfully" << std::endl;
+              << "If you must use " << #USELESS_ << " do so very carefully" << std::endl;
 /// In this case, STR_TO is the screaming element, and cout is written verbosely as it refers to std::cout
 #define PRINT_cout(STR_TO_cout_) std::cout << #STR_TO_cout_ << std::endl;
 /// Notice how here, INPUT does not reference anything, so it is not lower cased.
@@ -206,9 +196,7 @@ public:
 }
 ```
 
-<!-- TOC --><a name="enums"></a>
-
-### Enums
+#### Enums
 
 ```cpp
 /**
@@ -237,9 +225,7 @@ enum class FavoriteType {
 Alternatively, fancier macro classes (such as FANCY_ENUM from this project) can be utilized if such features are desired.
 ```
 
-<!-- TOC --><a name="for-loops"></a>
-
-### For Loops
+#### For Loops
 
 ```cpp
 /// For Loops:
@@ -250,7 +236,7 @@ for (ClassName _className : Container) {
 };
 
 /// Also, using auto is only allowed for for loops with iterators:
-/// (even here, auto is discoraged).
+/// (even here, auto is discouraged).
 for (auto it = container.begin(); it != container.end(); it++) {
     /// Do Stuff
 };
@@ -258,9 +244,7 @@ for (auto it = container.begin(); it != container.end(); it++) {
 /// **Iterator increment**: Prefer post-increment `it++` over pre-increment in for loops.
 ```
 
-<!-- TOC --><a name="variable-naming"></a>
-
-### Variable Naming
+#### Variable Naming
 
 **Hard rule**: Single-letter and two-letter variable names are prohibited except
 in the following specific cases:
@@ -277,13 +261,9 @@ in the following specific cases:
 readability and create cognitive overhead. The codebase should use full words
 consistently.
 
-<!-- TOC --><a name="comments"></a>
+#### Comments
 
-### Comments
-
-<!-- TOC --><a name="documentation-and-explanation"></a>
-
-#### Documentation and Explanation
+##### Documentation and Explanation
 
 ```cpp
 /// This type of comment is for actual commentary, note there are three slashes
@@ -299,9 +279,7 @@ std::string tmp{
 */
 ```
 
-<!-- TOC --><a name="todos-and-fixmes"></a>
-
-#### TODOs and FIXMEs
+##### TODOs and FIXMEs
 
 `TODO`s and `FIXME`s are meant to be temporary, they shall not be present in any
 code in a pull request. If any file that would be checked _must_ otherwise
@@ -312,16 +290,12 @@ contain TODOs, add it to your TODO-checker exclude list.
 /// @FIXME This is the source of a major problem (This code blows the program to smithereens, remedy and fix)
 ```
 
-<!-- TOC --><a name="x-macros"></a>
-
-### X-Macros
+#### X-Macros
 
 The codebase uses X-Macros (FOREACH-style macros) extensively for code
 generation. This section documents the conventions.
 
-<!-- TOC --><a name="x-macro-definition-files"></a>
-
-#### X-Macro Definition Files
+##### X-Macro Definition Files
 
 **Extension:** `FooDef.hpp`
 
@@ -349,9 +323,7 @@ generation. This section documents the conventions.
   X(bird, chirp)
 ```
 
-<!-- TOC --><a name="x-macro-generation-files"></a>
-
-#### X-Macro Generation Files
+##### X-Macro Generation Files
 
 **Extension:** `FooGen.hpp`
 
@@ -361,7 +333,7 @@ generation. This section documents the conventions.
 /// Declaration for one column
 #define PUT_ANIMAL_HEADER(NAME_, SAYS_)                          \
     void NAME_();                                                \
-    Q_INVOKABLE std::string get_##NAME_##_asString() const {     \
+    Q_INVOCABLE std::string get_##NAME_##_asString() const {     \
         return #SAYS_;                                           \
     }
 
@@ -371,9 +343,7 @@ generation. This section documents the conventions.
     std::string get_##NAME_##_asString() const { return #SAYS_; }
 ```
 
-<!-- TOC --><a name="x-macro-implementation-files"></a>
-
-#### X-Macro Implementation Files
+##### X-Macro Implementation Files
 
 **Extension:** `FooGen.impl.hpp`
 
@@ -387,9 +357,7 @@ generation. This section documents the conventions.
     } /* namespace macnut::db::animal */
 ```
 
-<!-- TOC --><a name="plain-header-files"></a>
-
-#### Plain Header Files
+##### Plain Header Files
 
 **Extension:** `Foo.hpp`
 
@@ -405,9 +373,7 @@ Definition and Gen macros.
 FOREACH_Animal(PUT_ANIMAL_HEADER);
 ```
 
-<!-- TOC --><a name="plain-c-files"></a>
-
-#### Plain C++ Files
+##### Plain C++ Files
 
 **Extension:** `Foo.cpp`
 
@@ -421,9 +387,7 @@ header.
 FOREACH_Animal(PUT_ANIMAL_IMPL);
 ```
 
-<!-- TOC --><a name="file-naming"></a>
-
-#### File Naming
+##### File Naming
 
 | File Type           | Pattern           | Purpose                            |
 | ------------------- | ----------------- | ---------------------------------- |
@@ -444,9 +408,7 @@ FOREACH_Animal(PUT_ANIMAL_IMPL);
 - `Vehicle.hpp` / `Vehicle.cpp` / `VehicleGen.hpp` / `VehicleGen.impl.hpp` /
   `VehicleDef.hpp`
 
-<!-- TOC --><a name="x-macro-macro-naming"></a>
-
-#### X-Macro Macro Naming
+##### X-Macro Macro Naming
 
 **Convention**: X-macro macros come in two forms:
 
@@ -459,9 +421,7 @@ FOREACH_Animal(PUT_ANIMAL_IMPL);
 - `PUT_FRUIT_HEADER` / `PUT_FRUIT_IMPL`
 - `PUT_VEHICLE_HEADER` / `PUT_VEHICLE_IMPL`
 
-<!-- TOC --><a name="foreach-x-macro-calls"></a>
-
-#### FOREACH (X-Macro) Calls
+##### FOREACH (X-Macro) Calls
 
 When a FOREACH-style macro is used as a **statement** (i.e. not inside an
 expression or parameter list), it must be followed by a semicolon. Without it,
