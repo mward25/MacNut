@@ -1,0 +1,21 @@
+---
+BasedOnStyle: Google
+---
+Language: Cpp
+EmptyLineBeforeAccessModifier: LogicalBlock
+IncludeBlocks: Preserve
+IndentWidth: 4
+IndentAccessModifiers: true
+InsertNewlineAtEOF: true
+IntegerLiteralSeparator:
+  Decimal: 3
+  DecimalMinDigits: 5
+SeparateDefinitionBlocks: Always
+SpaceAfterCStyleCast: true
+SpaceAfterLogicalNot: false
+AlignOperands: true
+AlignConsecutiveAssignments: true
+ColumnLimit: 100
+TabWidth: 4
+...
+

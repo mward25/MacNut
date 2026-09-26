@@ -1,0 +1,33 @@
+fail_fast: false
+# exclude: |
+#   (?x)^(
+#       src/external.*|
+#       resources/.*|
+#   )$
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v22.1.5
+    hooks:
+      - id: clang-format
+        args: ["-i"]
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.13
+    hooks:
+      - id: cmake-format
+  - repo: https://github.com/rvben/rumdl-pre-commit
+    rev: v0.2.77
+    hooks:
+      - id: rumdl
+        args: [--fix, --config=.rumdl.toml]
+      - id: rumdl-fmt
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        files: \.(yaml|yml)$
+      - id: end-of-file-fixer
+        files: \.(yaml|yml)$
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.49.0
+    hooks:
+      - id: typos
