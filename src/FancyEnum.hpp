@@ -8,58 +8,58 @@
 
 #define MNUT_FIRST_ARG(FIRST_ARG, ...) FIRST_ARG
 
-#define MNUT_PUT_ENUM_PART(enumName, ...) enumName MNUT_FIRST_ARG(__VA_ARGS__),
+#define MNUT_PUT_ENUM_PART(ENUM_NAME_, ...) ENUM_NAME_ MNUT_FIRST_ARG(__VA_ARGS__),
 
-#define MNUT_PUT_INTERNAL_ENUM(EnumType, FOREACH_ENUM) \
-    enum class InternalEnum : EnumType { FOREACH_ENUM(MNUT_PUT_ENUM_PART) };
+#define MNUT_PUT_INTERNAL_ENUM(ENUM_TYPE_, FOREACH_ENUM_) \
+    enum class InternalEnum : ENUM_TYPE_ { FOREACH_ENUM_(MNUT_PUT_ENUM_PART) };
 
-#define MNUT_PUT_STATIC_STR_FUNC_PART(enumName, ...) \
-    case InternalEnum::enumName:                     \
-        return str_##enumName;
-#define MNUT_PUT_STATIC_STR_FUNC_PART_STRS(enumName, ...) \
-    static const char* str_##enumName = #enumName;
+#define MNUT_PUT_STATIC_STR_FUNC_PART(ENUM_NAME_, ...) \
+    case InternalEnum::ENUM_NAME_:                     \
+        return str_##ENUM_NAME_;
+#define MNUT_PUT_STATIC_STR_FUNC_PART_STRS(ENUM_NAME_, ...) \
+    const char* str_##ENUM_NAME_ = #ENUM_NAME_;
 
-#define MNUT_PUT_STATIC_STR_FUNC(EnumName, EnumType, FOREACH_ENUM)            \
-    static constexpr std::string_view str(EnumName val) {                     \
-        FOREACH_ENUM(MNUT_PUT_STATIC_STR_FUNC_PART_STRS) switch (val.value) { \
-            FOREACH_ENUM(MNUT_PUT_STATIC_STR_FUNC_PART)                       \
+#define MNUT_PUT_STATIC_STR_FUNC(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_)            \
+    static constexpr std::string_view str(ENUM_NAME_ VALUE_) {                     \
+        FOREACH_ENUM_(MNUT_PUT_STATIC_STR_FUNC_PART_STRS) switch (VALUE_.value) { \
+            FOREACH_ENUM_(MNUT_PUT_STATIC_STR_FUNC_PART)                       \
             default:                                                          \
                 return "";                                                    \
         }                                                                     \
     }
 
-#define MNUT_PUT_STATIC_FROM_STR_FUNC_PART(enumName, ...) \
-    if (inputStr == std::string_view(#enumName)) {        \
-        return FancyEnumClass::enumName();                \
+#define MNUT_PUT_STATIC_FROM_STR_FUNC_PART(ENUM_NAME_, ...) \
+    if (INPUT_STR_ == std::string_view(#ENUM_NAME_)) {        \
+        return FancyEnumClass::ENUM_NAME_();                \
     }
 
-#define MNUT_PUT_STATIC_FROM_STR_FUNC(EnumName, FOREACH_ENUM)                        \
-    static constexpr std::optional<EnumName> from(const std::string_view inputStr) { \
-        FOREACH_ENUM(MNUT_PUT_STATIC_FROM_STR_FUNC_PART)                             \
-        return std::optional<EnumName>();                                            \
+#define MNUT_PUT_STATIC_FROM_STR_FUNC(ENUM_NAME_, FOREACH_ENUM_)                        \
+    static constexpr std::optional<ENUM_NAME_> from(const std::string_view INPUT_STR_) { \
+        FOREACH_ENUM_(MNUT_PUT_STATIC_FROM_STR_FUNC_PART)                             \
+        return std::optional<ENUM_NAME_>();                                            \
     }
 
-#define MNUT_PUT_ENUM_FUNCS_PART(enumName, ...) \
-    static constexpr FancyEnumClass enumName() { return FancyEnumClass(InternalEnum::enumName); }
+#define MNUT_PUT_ENUM_FUNCS_PART(ENUM_NAME_, ...) \
+    static constexpr FancyEnumClass ENUM_NAME_() { return FancyEnumClass(InternalEnum::ENUM_NAME_); }
 
-#define MNUT_PUT_ENUM_SIZE_PART(enumName, ...) 1 +
+#define MNUT_PUT_ENUM_SIZE_PART(ENUM_NAME_, ...) 1 +
 
-#define MNUT_PUT_ENUM_SIZE(EnumName, EnumType, FOREACH_ENUM) \
-    static constexpr EnumType SIZE = FOREACH_ENUM(MNUT_PUT_ENUM_SIZE_PART) 0;
+#define MNUT_PUT_ENUM_SIZE(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_) \
+    static constexpr ENUM_TYPE_ SIZE = FOREACH_ENUM_(MNUT_PUT_ENUM_SIZE_PART) 0;
 
-#define MNUT_PUT_ENUM_VALUES_PART(enumName, ...) FancyEnumClass::enumName(),
+#define MNUT_PUT_ENUM_VALUES_PART(ENUM_NAME_, ...) FancyEnumClass::ENUM_NAME_(),
 
-#define MNUT_PUT_ENUM_VALUES(EnumName, EnumType, FOREACH_ENUM)                                \
-    static constexpr std::array<EnumName, EnumName::SIZE> values() {                          \
-        return std::array<EnumName, EnumName::SIZE>{FOREACH_ENUM(MNUT_PUT_ENUM_VALUES_PART)}; \
+#define MNUT_PUT_ENUM_VALUES(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_)                                \
+    static constexpr std::array<ENUM_NAME_, ENUM_NAME_::SIZE> values() {                          \
+        return std::array<ENUM_NAME_, ENUM_NAME_::SIZE>{FOREACH_ENUM_(MNUT_PUT_ENUM_VALUES_PART)}; \
     }
 
-#define MNUT_PUT_FANCY_ENUM_HASH(EnumName, EnumType)                   \
+#define MNUT_PUT_FANCY_ENUM_HASH(ENUM_NAME_, ENUM_TYPE_)                   \
     namespace std {                                                    \
     template <>                                                        \
-    struct hash<EnumName> {                                            \
-            std::size_t operator()(const EnumName& s) const noexcept { \
-                return std::hash<EnumType>{}(s.raw());                 \
+    struct hash<ENUM_NAME_> {                                            \
+            std::size_t operator()(const ENUM_NAME_& enumName) const noexcept { \
+                return std::hash<ENUM_TYPE_>{}(enumName.raw());                 \
             }                                                          \
     };                                                                 \
     }
@@ -67,12 +67,12 @@
 /**
  * Creates an enum class implementation with conversion and string methods.
  *
- * For each enum value defined in the FOREACH_ENUM macro, the EnumName class
+ * For each enum value defined in the FOREACH_ENUM_ macro, the ENUM_NAME_ class
  * exposes a static constexpr function that returns an instance of that enum.
- * Usage: EnumName::VALUE() (e.g., EffectType::NONE())
+ * Usage: ENUM_NAME_::VALUE() (e.g., EffectType::NONE())
  *
- * The EnumName class exposes:
- *   - raw(): Returns the underlying EnumType value
+ * The ENUM_NAME_ class exposes:
+ *   - raw(): Returns the underlying ENUM_TYPE_ value
  *   - str(): Returns string representation of the enum
  *   - from(string_view): Parses string to enum (returns optional)
  *   - Values: Returns array containing all enum instances
@@ -80,49 +80,42 @@
  * Example:
  *   auto allValues = EffectType::values();  // std::array<EffectType, N>
  */
-#define MNUT_PUT_FANCY_ENUM_BARE(EnumName, EnumType, FOREACH_ENUM, ...)                         \
-    struct EnumName {                                                                           \
+#define MNUT_PUT_FANCY_ENUM_BARE(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_, ...)                         \
+    struct ENUM_NAME_ {                                                                           \
         private:                                                                                \
-            using FancyEnumClass = EnumName;                                                    \
-            MNUT_PUT_INTERNAL_ENUM(EnumType, FOREACH_ENUM)                                      \
+            using FancyEnumClass = ENUM_NAME_;                                                    \
+            MNUT_PUT_INTERNAL_ENUM(ENUM_TYPE_, FOREACH_ENUM_)                                      \
             InternalEnum value;                                                                 \
-            constexpr EnumName(const InternalEnum& value) : value(value) {}                     \
+            constexpr ENUM_NAME_(const InternalEnum& value) : value(value) {}                     \
                                                                                                 \
         public:                                                                                 \
-            /** Constructors (Default) */                                                       \
-            constexpr EnumName(const EnumName&)            = default;                           \
-            constexpr EnumName(EnumName&&)                 = default;                           \
-            constexpr EnumName& operator=(const EnumName&) = default;                           \
-            constexpr EnumName& operator=(EnumName&&)      = default;                           \
+            /** Constructors (Default) */                                                         \
+            constexpr ENUM_NAME_(const ENUM_NAME_&)            = default;                           \
+            constexpr ENUM_NAME_(ENUM_NAME_&&)                 = default;                           \
+            constexpr ENUM_NAME_& operator=(const ENUM_NAME_&) = default;                           \
+            constexpr ENUM_NAME_& operator=(ENUM_NAME_&&)      = default;                           \
                                                                                                 \
-            /** Default Operators */                                                            \
-            constexpr bool operator==(const EnumName&) const                  = default;        \
-            constexpr std::strong_ordering operator<=>(const EnumName&) const = default;        \
-            using Type                                                        = EnumType;       \
+            /** Default Operators */                                                              \
+            constexpr bool operator==(const ENUM_NAME_&) const                  = default;        \
+            constexpr std::strong_ordering operator<=>(const ENUM_NAME_&) const = default;        \
+            using Type                                                        = ENUM_TYPE_;       \
             constexpr explicit operator Type() const { return static_cast<Type>(this->value); } \
             constexpr operator InternalEnum() const {                                           \
                 return static_cast<InternalEnum>(this->value);                                  \
             }                                                                                   \
-            /** .raw returns underying EnumType */                                              \
-            static constexpr EnumType raw(EnumName input) { return static_cast<Type>(input); }  \
-            constexpr EnumType raw() const { return EnumName::raw(*this); }                     \
-            /** SIZE is how many enums there are, not the biggest enum */                       \
-            MNUT_PUT_ENUM_SIZE(EnumName, EnumType, FOREACH_ENUM)                                \
-            MNUT_PUT_STATIC_STR_FUNC(EnumName, EnumType, FOREACH_ENUM)                          \
-            constexpr std::string_view str() const { return EnumName::str(*this); }             \
-            MNUT_PUT_STATIC_FROM_STR_FUNC(EnumName, FOREACH_ENUM)                               \
-            FOREACH_ENUM(MNUT_PUT_ENUM_FUNCS_PART)                                              \
-            MNUT_PUT_ENUM_VALUES(EnumName, EnumType, FOREACH_ENUM)                              \
-            __VA_ARGS__##__VA_OPT__((EnumName, EnumType, FOREACH_ENUM))                         \
+            /** .raw returns underlying ENUM_TYPE_ */                                            \
+            static constexpr ENUM_TYPE_ raw(ENUM_NAME_ input) { return static_cast<Type>(input); }  \
+            constexpr ENUM_TYPE_ raw() const { return ENUM_NAME_::raw(*this); }                     \
+            /** SIZE is how many enums there are, not the biggest enum */                     \
+            MNUT_PUT_ENUM_SIZE(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_)                                \
+            MNUT_PUT_STATIC_STR_FUNC(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_)                          \
+            constexpr std::string_view str() const { return ENUM_NAME_::str(*this); }             \
+            MNUT_PUT_STATIC_FROM_STR_FUNC(ENUM_NAME_, FOREACH_ENUM_)                               \
+            FOREACH_ENUM_(MNUT_PUT_ENUM_FUNCS_PART)                                              \
+            MNUT_PUT_ENUM_VALUES(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_)                              \
+            __VA_OPT__(__VA_ARGS__(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_))                              \
     };
 
-#define MNUT_PUT_FANCY_ENUM(EnumName, EnumType, FOREACH_ENUM, ...)          \
-    MNUT_PUT_FANCY_ENUM_BARE(EnumName, EnumType, FOREACH_ENUM, __VA_ARGS__) \
-    MNUT_PUT_FANCY_ENUM_HASH(EnumName, EnumType)
-
-#define FOREACH_TestEnum(X) \
-    X(PEACHES)              \
-    X(APPLES)               \
-    X(PEARS)
-
-MNUT_PUT_FANCY_ENUM(TestEnum, int, FOREACH_TestEnum)
+#define MNUT_PUT_FANCY_ENUM(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_, ...)          \
+    MNUT_PUT_FANCY_ENUM_BARE(ENUM_NAME_, ENUM_TYPE_, FOREACH_ENUM_, __VA_ARGS__) \
+    MNUT_PUT_FANCY_ENUM_HASH(ENUM_NAME_, ENUM_TYPE_)
